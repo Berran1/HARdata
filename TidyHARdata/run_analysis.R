@@ -65,7 +65,7 @@ reshapeHAR <- melt(cutHAR, id = 1:2)
 testMean <- grepl("mean", reshapeHAR$variable)
 reshapeHAR$measureType <- ifelse(testMean == TRUE, "mean", "std")
 reshapeHAR$measureType <- as.factor(reshapeHAR$measureType)
-reshapeHAR <- reshapeHAR[,c(1, 2, 6, 4, 5)]
+reshapeHAR <- reshapeHAR[,c(1, 2, 5, 3, 4)]
 reshapeHAR$variable <- gsub("mean|std","", reshapeHAR$variable)
 reshapeHAR$variable <- as.factor(reshapeHAR$variable)
 reshapeHAR2 <- reshapeHAR
