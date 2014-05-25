@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=9" >
+
+<title>Aggregated Average Data from a Human Activity Recognition Dataset</title>
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 12px;
+   margin: 8px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 { 
+   font-size:2.2em; 
+}
+
+h2 { 
+   font-size:1.8em; 
+}
+
+h3 { 
+   font-size:1.4em; 
+}
+
+h4 { 
+   font-size:1.0em; 
+}
+
+h5 { 
+   font-size:0.9em; 
+}
+
+h6 { 
+   font-size:0.8em; 
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre {	
+   margin-top: 0;
+   max-width: 95%;
+   border: 1px solid #ccc;
+   white-space: pre-wrap;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code.r, code.cpp {
+   background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * { 
+      background: transparent !important; 
+      color: black !important; 
+      filter:none !important; 
+      -ms-filter: none !important; 
+   }
+
+   body { 
+      font-size:12pt; 
+      max-width:100%; 
+   }
+       
+   a, a:visited { 
+      text-decoration: underline; 
+   }
+
+   hr { 
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote { 
+      padding-right: 1em; 
+      page-break-inside: avoid; 
+   }
+
+   tr, img { 
+      page-break-inside: avoid; 
+   }
+
+   img { 
+      max-width: 100% !important; 
+   }
+
+   @page :left { 
+      margin: 15mm 20mm 15mm 10mm; 
+   }
+     
+   @page :right { 
+      margin: 15mm 10mm 15mm 20mm; 
+   }
+
+   p, h2, h3 { 
+      orphans: 3; widows: 3; 
+   }
+
+   h2, h3 { 
+      page-break-after: avoid; 
+   }
+}
+
+</style>
+
+
+
+
+
+</head>
+
+<body>
+<h1>Aggregated Average Data from a Human Activity Recognition Dataset</h1>
+
+<h2>Introduction</h2>
+
+<p>This is the Course Project for the Getting and Cleaning Data Coursera course from May 2014, taught by Jeff Leek from Johns Hopkins University. 
+The analysis code produces a tidy dataset containing average mean and standard deviation smartphone activity measurements for 30 subjects performing 6 different activities (walking, walking upstairs, walking downstairs, sitting, standing and laying). 
+The R code for analysis can be found in <em>run_analysis.R</em> in this repo. </p>
+
+<h2>Source</h2>
+
+<p>The raw dataset is taken from work by Reyes-Ortiz et al., found here:
+   <a href="http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones">http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones</a></p>
+
+<p>Some unchanged variable names and descriptions are duplicated from the raw data description there. </p>
+
+<p>It is assumed that the zipped folder from the Getting and Cleaning Data assignment page has been unzipped to a folder in the working directory called </p>
+
+<blockquote>
+<p>/UCI HAR Dataset/ </p>
+</blockquote>
+
+<p>Because we are concerned only with the mean and standard deviation for each measurement, the &ldquo;Inertial Signals&rdquo; subfolders for test and training datasets, which contain a rawer form of the smartphone accelerator and gyroscope data, are not needed for this project. </p>
+
+<h2>Creating the Tidy Dataset</h2>
+
+<h3>1. A single Dataframe of Test and Training Data</h3>
+
+<p>This section explains how to create a single dataframe containing all observations for subjects in both the test and training datasets. This joint dataset is then used for further analysis. 
+The example is for Test set but should be repeated for Training.</p>
+
+<ol>
+<li><p>Read the <em>/test/subject_test.txt</em> file (a single column of the subject associated with each observation) and name the resulting vector as <code>subject</code>.</p></li>
+<li><p>Read the <em>/test/Y_test.txt</em> file (a single column of activities coded as integers 1-6) and name the resulting vector as <code>activity</code>.</p></li>
+<li><p>Read the <em>/test/X_test.txt</em> file (561 columns of observations) as <code>trainData</code>.</p>
+
+<ul>
+<li>The columns should take <code>col.names</code> from the <em>/features.txt</em> file - the names are in column 2 of that file. </li>
+</ul></li>
+<li><p>Use cbind to attach <code>subject</code> and <code>activity</code> columns on the left of the <code>trainData</code> observation set, creating a single dataframe with id variables at left and measurement variables at right as per convention. </p></li>
+</ol>
+
+<p>Steps 1-4 are repeated for the training dataset. While it is possible to join the data first, the subject and activity binding was done in this order to ensure matching of subjects, activities, and the associated observations. </p>
+
+<p>Now &#39;rbind&#39; can be used to create a joint dataset of the training and test data (allHAR), with 10299 rows and 563 columns. I use a check that column names are identical first to ensure no error.  </p>
+
+<p>The activity and subject variables by default have the integer class, but should be factors. They are converted to factors using the <code>as.factor</code> command. </p>
+
+<h3>2. Extract Measurements for mean and standard deviation only, for each measurement.</h3>
+
+<p>The <em>/features_info.txt</em> file from the original dataset contains details of the 561 observation variables recorded for each observation window of a subject performing an activity. 
+There are 17 main observation types in the raw data, some of which are time (t&hellip;) and some Fast Fourier Transform frequency domain (f&hellip;) variables. From <em>/features_info.txt</em> the different variable types are:</p>
+
+<blockquote>
+<ul>
+<li>tBodyAcc-XYZ</li>
+<li>tGravityAcc-XYZ</li>
+<li>tBodyAccJerk-XYZ</li>
+<li>tBodyGyro-XYZ</li>
+<li>tBodyGyroJerk-XYZ</li>
+<li>tBodyAccMag</li>
+<li>tGravityAccMag</li>
+<li>tBodyAccJerkMag</li>
+<li>tBodyGyroMag</li>
+<li>tBodyGyroJerkMag</li>
+<li>fBodyAcc-XYZ</li>
+<li>fBodyAccJerk-XYZ</li>
+<li>fBodyGyro-XYZ</li>
+<li>fBodyAccMag</li>
+<li>fBodyAccJerkMag</li>
+<li>fBodyGyroMag</li>
+<li>fBodyGyroJerkMag</li>
+</ul>
+</blockquote>
+
+<p>Each of these has multiple parameters associated, each as its own column, including mean (<strong>-mean</strong>) and standard deviation (<strong>-std</strong>) as we require. There is also a mean frequency (<strong>-meanFreq</strong>) for some observations and this is NOT useful for our analysis but will need to be noted in identifying columns. </p>
+
+<p>Examples of the column headings required for our analysis: </p>
+
+<ul>
+<li>tBodyAccJerk-mean()-X </li>
+<li>fBodyGyro-std()-Y</li>
+</ul>
+
+<p>There are also, we see in the <em>/features_info.txt</em> file: </p>
+
+<blockquote>
+<p>Additional vectors obtained by averaging the signals in a signal window sample. These are used on the angle() variable.</p>
+</blockquote>
+
+<p>These averages within a measurement window sample of the angle variable have been excluded from this analysis as they do not directly go towards the mean and standard deviation of the accelerator and gyroscope measurements as outlined above. These could be considered in a separate analysis (not included). They are named by convention in the form <strong>tBodyAccMean</strong> - Mean is capitalised - and this will enable identification and separation of relevant columns only so long as the case is not ignored. </p>
+
+<p>To find the columns to retain, we can use regular expressions in the <code>grep</code> command to find a vector of column indices of the relevant observations containing &ldquo;mean&rdquo; or &ldquo;std&rdquo;. angle measurements are excluded by using lowercase, and meanFreq measurements are excluded by negation of the capital F (<code>mean[^F]</code>). The command is:</p>
+
+<pre><code>meanOrStd &lt;- grep((&quot;mean[^F]|std&quot;), names(allHAR))
+</code></pre>
+
+<p>This vector is joined to the id variables subject and activity (columns 1:2) so that they are also retained in the subset and we can define a new dataframe from this limited subset, containing 68 columns. This is named as <em>cutHAR</em>. </p>
+
+<h3>3. and 4. Activity Naming and Labelling</h3>
+
+<ul>
+<li><p>The first step involves labelling the subject activities with descriptive terms rather than numbers. 
+We can use the <em>/activity_labels.txt</em> file to identify descriptors, and the <code>mapvalues</code> function from the <code>plyr</code> package to replace the factor levels &ldquo;1&rdquo; to &ldquo;6&rdquo; with appropriate versions of the descriptors (eg in lowercase and removing underscores). </p></li>
+<li><p>For the observation mean and std data, the names should be changed to work with convention. </p>
+
+<ul>
+<li>Fixed a group of column names with &ldquo;Body&rdquo; duplicated which does not align with the */features_info.txt&quot; file).</li>
+<li>Brackets and hyphens which will cause problems in R (and have already been switched to periods by the program) have been removed. Note necessity for escaping out brackets and periods with double backslash (eg <code>&quot;\\.&quot;</code>) </li>
+<li>Inner capital letters are preserved for readability using &ldquo;camel&rdquo; convention. </li>
+<li>&ldquo;t&rdquo; for time and &ldquo;f&rdquo; for frequency signifiers at start of names are preserved as is without expansion - although human-readable descriptors are encouraged, in this case the rest of the label will require reference to codebook and so it did not seem worth expanding at cost of extra length (particularly because &ldquo;time&rdquo; and &ldquo;frequency&rdquo; do not on their own clarify enough about these measurements). </li>
+<li>Order within names changed to put X/Y/Z before mean/std: this fits with logic and convention, as the mean/std is an operation on a defined observation in X/Y/Z so the type of operation should come at the end rather than in the middle. </li>
+</ul></li>
+</ul>
+
+<h3>5. Developing a Tidy Dataset of Averages of Means and Standard Deviations for each Subject and Activity combination.</h3>
+
+<p>The <code>melt</code> and <code>cast</code> functions from the <code>reshape2</code> package can be used to generate averages for each subject/activity pair.</p>
+
+<p>The <code>cutHAR</code> dataset was melted using <em>subject</em> and <em>activity</em> as id variables, leaving the rest as measurement variables. 
+This yields a 4-column, &ldquo;long skinny&rdquo; dataframe of 679,734 observations. </p>
+
+<p>For true tidy data, the mean and standard deviation designations will be put in their own column (this could also be done with time and frequency designations but because we do not want to sort by each of those, it is unnecessary as it would go back into a joint variable name). In this dataframe I introduced a new column (placed 3rd) as a factor with two levels, &ldquo;mean&rdquo; and &ldquo;std&rdquo;, to define the type of operation that had been carried out. 
+<code>gsub</code> was used to then remove the mean or std information from the variable name. This means that the variable name has essentially been split across two columns, one telling what the observation is and the other showing whether it is a mean or standard deviation operation on that observation. </p>
+
+<p>The average of each set of data (mean or std), for each activity, for each subject, is then found using the <code>dcast</code> function:</p>
+
+<pre><code>averageHAR &lt;- dcast(reshapeHAR, subject + activity + measureType ~ variable, mean)
+</code></pre>
+
+<p>Note that if one wanted to instead use the original variables, this is easily done by investigating subject and activity as a function of a combined variable + measureType which regains the original variable descriptions (not shown). </p>
+
+<p>The tidy dataset <code>averageHAR</code> is then reordered so that column names of variables are not in alphabetical order but in the order of the original dataset.
+This tidy dataset is then exported to a tab-delimited text file using <code>write.table</code>. </p>
+
+</body>
+
+</html>
+
